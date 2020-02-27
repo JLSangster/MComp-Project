@@ -14,7 +14,7 @@ dataLoader = ImageDataGenerator()
 trainSet = dataLoader.flow_from_directory('dice/train', class_mode = 'categorical')
 testSet = dataLoader.flow_from_directory('dice/valid', class_mode = 'categorical')
 
-epochs = 5
+epochs = 2
 height = 256
 width = 256
 batchSize = 4
@@ -32,9 +32,6 @@ cnn.add(MaxPooling2D())
 cnn.add(Flatten())
 cnn.add(Dense(classes, activation = 'softmax'))
 cnn.compile(optimizer='SGD', loss='categorical_crossentropy', metrics=['accuracy'])
-#print("Got this far")
-#cnn.fit_generator(trainSet, steps_per_epoch=batchSize, epochs=epochs)
-#cnn.evaluate_generator()
 
 inception = InceptionV3(weights ='imagenet', include_top=False, input_shape = (height,width,channels))
 tNet = inception.output
@@ -42,4 +39,13 @@ tNet = Flatten()(tNet)
 predictions = Dense(classes, activation = 'softmax')(tNet)
 transferNet = Model(inputs=inception.input, outputs=predictions)
 transferNet.compile(optimizer='SGD', loss='categorical_crossentropy', metrics=['accuracy'])
+
+#cross validation stuff here
+
+#Need a timer here
+#cnn.fit_generator(trainSet, steps_per_epoch=batchSize, epochs=epochs)
+#Timer stop here?
+#cnn.evaluate_generator()
+#need timer here
 transferNet.fit_generator(trainSet, steps_per_epoch=batchSize, epochs=epochs)
+#timer stop here

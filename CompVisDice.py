@@ -25,7 +25,7 @@ gKernel180 = cv2.getGaborKernel((21,21), 9.0, 180, 10.0, 0.5, 0, ktype=cv2.CV_32
 textureImg180 = cv2.filter2D(grayimg, cv2.CV_8UC3, gKernel180)
 
 #cv2.drawContours(img, contours, -1, (0,0,255), cv2.FILLED)
-#cv2.imshow('whaqt is happening', img)
+#cv2.imshow('what is happening', img)
 #dst = cv2.dilate(dst,None)
 
 #need to combine these features to get a shape of the face.
@@ -50,11 +50,10 @@ maskEdge = cv2.copyMakeBorder(edges, 1, 1, 1, 1, cv2.BORDER_REPLICATE)
 cv2.floodFill(obj, maskEdge, (0,0), 255) # to eliminate the shadow look at mask and determine how it can fill the region up to the edge
 
 #conntected objs?
-#cv2.imshow('2', mask)
-#cv2.imshow('3', thresh)
-#cv2.imshow('4', maskEdge)
-#cv2.imshow('4', textureImg0)
-cv2.imshow('5', textureImg180)
+#cont = cv2.drawContours(img, contours, -1, (0, 255, 0), 3)
+#cv2.imshow('1', cont)
+#uselesscv2.imshow('2', obj)
+#cv2.imshow('5', textureImg180)
 ##cv2.imshow('', comp)
 if cv2.waitKey(0) & 0xff == 27:
     cv2.destroyAllWindows()

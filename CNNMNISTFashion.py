@@ -16,6 +16,17 @@ xTest = np.repeat(xTest[..., np.newaxis], 3, -1)
 yTrain = utils.to_categorical(yTrain, 10)
 yTest = utils.to_categorical(yTest, 10)
 
+#splitting the data for cross validation
+#I actually don't know how many folds but it doesn't matter
+#Calc the min size of the folds - account for remaineders
+
+#for each fold
+    #randomly fill with unused data up to the minimum
+#then for each of the remainders
+    #randomly allocate one to each fold until all data used
+
+#is there a function for this?
+
 #CNN - same as from thingy - next step is to adjust for optimising
 #cnn = Sequential()
 #cnn.add(Conv2D(64, kernel_size = 3, activation = 'relu', input_shape = (28, 28, 3)))
