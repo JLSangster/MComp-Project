@@ -4,48 +4,196 @@
 #imports
 import os
 from keras.preprocessing.image import ImageDataGenerator
-from keras.models import Sequential, Model
+from keras.models import Sequential, Model, load_model
 from keras.layers import Dense, Conv2D, Flatten, MaxPooling2D
 from keras.applications.inception_v3 import InceptionV3
+import time
 
-#Using special loaders to prevent massive memory use
-#use fit_generator and evaluate_generator so the model knows.
-dataLoader = ImageDataGenerator()
-trainSet = dataLoader.flow_from_directory('dice/train', class_mode = 'categorical')
-testSet = dataLoader.flow_from_directory('dice/valid', class_mode = 'categorical')
-
-epochs = 2
-height = 256
-width = 256
-batchSize = 4
+height = 128
+width = 128
 channels = 3
 classes = 6
 
-#Then build the pure cnn
-cnn = Sequential()
+dataLoader = ImageDataGenerator()
 
-#check first thing
-cnn.add(Conv2D(64, kernel_size = 3, activation = 'relu', input_shape = (height, width, channels)))
-cnn.add(Conv2D(32, kernel_size = 3, activation = 'relu'))
-cnn.add(Conv2D(16, kernel_size = 3, activation = 'relu'))
-cnn.add(MaxPooling2D())
-cnn.add(Flatten())
-cnn.add(Dense(classes, activation = 'softmax'))
-cnn.compile(optimizer='SGD', loss='categorical_crossentropy', metrics=['accuracy'])
+fold1 = dataLoader.flow_from_directory('dice/fold1', class_mode = 'categorical', target_size = (height, width))
+fold2 = dataLoader.flow_from_directory('dice/fold2', class_mode = 'categorical', target_size = (height, width))
+fold3 = dataLoader.flow_from_directory('dice/fold3', class_mode = 'categorical', target_size = (height, width))
+fold4 = dataLoader.flow_from_directory('dice/fold4', class_mode = 'categorical', target_size = (height, width))
+fold5 = dataLoader.flow_from_directory('dice/fold5', class_mode = 'categorical', target_size = (height, width))
 
-inception = InceptionV3(weights ='imagenet', include_top=False, input_shape = (height,width,channels))
-tNet = inception.output
-tNet = Flatten()(tNet)
-predictions = Dense(classes, activation = 'softmax')(tNet)
-transferNet = Model(inputs=inception.input, outputs=predictions)
-transferNet.compile(optimizer='SGD', loss='categorical_crossentropy', metrics=['accuracy'])
+epochs = 5
+batchSize = 64
+steps = 3278/batchSize
 
-#cross validation stuff here
+cnn = load_model("cnn.h5")
+transferNet = load_model("transferNet.h5")
 
-#Need a timer here
-#cnn.fit_generator(trainSet, steps_per_epoch=batchSize, epochs=epochs)
-#Timer stop here?
-#cnn.evaluate_generator()
-#need timer here
-transferNet.fit_generator(trainSet, steps_per_epoch=batchSize, epochs=epochs)
-#timer stop here
+cnnTrainTimes = [0,0,0,0,0]
+cnnTestTimes = [0,0,0,0,0]
+cnnAccuracies = []
+transTrainTimes = [0,0,0,0,0]
+transTestTimes = [0,0,0,0,0]
+transAccuracies = []
+
+
+for i in range(1,6):
+    for j in range(1,6):
+        if (j == 1 & j != i):
+            #start timer
+            startTime = time.time()
+            cnn.fit_generator(fold1, steps_per_epoch=steps, epochs=epochs, verbose = 1)
+            #end timer
+            end_time = time.time()
+            #add the time to the cnnTrainTimes
+            cnnTrainTimes[i] += (endTime - startTime)
+            #start timeer
+            startTime = time.time()
+            transferNet.fit_generator(fold1, steps_per_epoch=steps, epochs=epochs, verbose = 1)
+            #end timer
+            endTime = time.time()
+            #add the time to the transTrainTimes
+            transTrainTimes[i] +=(endTime - startTime)
+        elif (j == 2 & j != i):
+            #start timer
+             startTime = time.time()
+             cnn.fit_generator(fold2, steps_per_epoch=steps, epochs=epochs, verbose = 1)
+             #end timer
+             end_time = time.time()
+             #add the time to the cnnTrainTimes
+             cnnTrainTimes[i] += (endTime - startTime)
+             #start timeer
+             startTime = time.time()
+             transferNet.fit_generator(fold2, steps_per_epoch=steps, epochs=epochs, verbose = 1)
+             #end timer
+             endTime = time.time()
+             #add the time to the transTrainTimes
+             transTrainTimes[i] +=(endTime - startTime)
+        elif (j == 3 & j != i):
+             #start timer
+             startTime = time.time()
+             cnn.fit_generator(fold3, steps_per_epoch=steps, epochs=epochs, verbose = 1)
+             #end timer
+             end_time = time.time()
+             #add the time to the cnnTrainTimes
+             cnnTrainTimes[i] += (endTime - startTime) #start timeer
+             startTime = time.time()
+             transferNet.fit_generator(fold3, steps_per_epoch=steps, epochs=epochs, verbose = 1)
+             #end timer
+             endTime = time.time()
+             #add the time to the transTrainTimes
+             transTrainTimes[i] +=(endTime - startTime)
+        elif (j == 4 & j != i):
+             #start timer
+             startTime = time.time()
+             cnn.fit_generator(fold4, steps_per_epoch=steps, epochs=epochs, verbose = 1)
+             #end timer
+             end_time = time.time()
+             #add the time to the cnnTrainTimes
+             cnnTrainTimes[i] += (endTime - startTime)
+             #start timeer
+             startTime = time.time()
+             transferNet.fit_generator(fold4, steps_per_epoch=steps, epochs=epochs, verbose = 1)
+             #end timer
+             endTime = time.time()
+             #add the time to the transTrainTimes
+             transTrainTimes[i] +=(endTime - startTime)
+        elif (j == 5 & j != i):
+             #start timer
+             startTime = time.time()
+             cnn.fit_generator(fold5, steps_per_epoch=steps, epochs=epochs, verbose = 1)
+             #end timer
+             end_time = time.time()
+             #add the time to the cnnTrainTimes
+             cnnTrainTimes[i] += (endTime - startTime) #start timeer
+             startTime = time.time()
+             transferNet.fit_generator(fold5, steps_per_epoch=steps, epochs=epochs, verbose = 1)
+             #end timer
+             endTime = time.time()
+             #add the time to the transTrainTimes
+             transTrainTimes[i] +=(endTime - startTime)
+    if (i == 1):
+        #start timer
+        startTime = time.time()
+        cnn.evaluate_generator(fold1, verbose = 1)
+        #end timer
+        endTime = time.time()
+        #append the time to cnnTestTime
+        cnnTestTimes[i] += (endTime - startTime)
+        #add to the accuracies
+        #start timer
+        startTime = time.time()
+        transferNet.evaluate_generator(fold1, verbose = 1)
+        #end timer
+        endTime = time.time()
+        #append the time to transTestTime
+        transTestTime += (endTime-startTime)
+        #add to the accuracies
+    elif (i == 2):
+        #start timer
+        startTime = time.time()
+        cnn.evaluate_generator(fold2, verbose = 1)
+        #end timer
+        endTime = time.time()
+        #append the time to cnnTestTime
+        cnnTestTimes[i] += (endTime - startTime)
+        #add to the accuracies
+        #start timer
+        startTime = time.time()
+        transferNet.evaluate_generator(fold2, verbose = 1)
+        #end timer
+        endTime = time.time()
+        #append the time to transTestTime
+        transTestTime += (endTime-startTime)
+        #add to the accuracies
+    elif (i == 3):
+        #start timer
+        startTime = time.time()
+        cnn.evaluate_generator(fold3, verbose = 1)
+        #end timer
+        endTime = time.time()
+        #append the time to cnnTestTime
+        cnnTestTimes[i] += (endTime - startTime)
+        #add to the accuracies
+        #start timer
+        startTime = time.time()
+        transferNet.evaluate_generator(fold3, verbose = 1)
+        #end timer
+        endTime = time.time()
+        #append the time to transTestTime
+        transTestTime += (endTime-startTime)
+        #add to the accuracies
+    elif (i == 4):
+        #start timer
+        startTime = time.time()
+        cnn.evaluate_generator(fold4, verbose = 1)
+        #end timer
+        endTime = time.time()
+        #append the time to cnnTestTime
+        cnnTestTimes[i] += (endTime - startTime)
+        #add to the accuracies
+        #start timer
+        startTime = time.time()
+        transferNet.evaluate_generator(fold4, verbose = 1)
+        #end timer
+        endTime = time.time()
+        #append the time to transTestTime
+        transTestTime += (endTime-startTime)
+        #add to the accuracies
+    elif (i == 5):
+        #start timer
+        startTime = time.time()
+        cnn.evaluate_generator(fold5, verbose = 1)
+        #end timer
+        endTime = time.time()
+        #append the time to cnnTestTime
+        cnnTestTimes[i] += (endTime - startTime)
+        #add to the accuracies
+        #start timer
+        startTime = time.time()
+        transferNet.evaluate_generator(fold5, verbose = 1)
+        #end timer
+        endTime = time.time()
+        #append the time to transTestTime
+        transTestTime += (endTime-startTime)
+        #add to the accuracies
