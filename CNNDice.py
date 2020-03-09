@@ -21,8 +21,9 @@ fold2 = dataLoader.flow_from_directory('dice/fold2', class_mode = 'categorical',
 fold3 = dataLoader.flow_from_directory('dice/fold3', class_mode = 'categorical', target_size = (height, width))
 fold4 = dataLoader.flow_from_directory('dice/fold4', class_mode = 'categorical', target_size = (height, width))
 fold5 = dataLoader.flow_from_directory('dice/fold5', class_mode = 'categorical', target_size = (height, width))
+folds = [fold1, fold2, fold3, fold4, fold5]
 
-epochs = 5
+epochs = 3
 batchSize = 64
 steps = 3278/batchSize
 
@@ -36,164 +37,54 @@ transTrainTimes = [0,0,0,0,0]
 transTestTimes = [0,0,0,0,0]
 transAccuracies = []
 
+loss, acc = cnn.evaluate_generator(fold1)
+print(acc)
 
 for i in range(1,6):
     for j in range(1,6):
-        if (j == 1 & j != i):
-            #start timer
-            startTime = time.time()
-            cnn.fit_generator(fold1, steps_per_epoch=steps, epochs=epochs, verbose = 1)
-            #end timer
-            end_time = time.time()
-            #add the time to the cnnTrainTimes
+        if j != i:
+            startTime=time.time()
+            cnn.fit_generator(folds[j], steps_per_epoch=steps, epochs=epochs, verbose = 0)
+            endTime=time.time()
             cnnTrainTimes[i] += (endTime - startTime)
-            #start timeer
             startTime = time.time()
-            transferNet.fit_generator(fold1, steps_per_epoch=steps, epochs=epochs, verbose = 1)
-            #end timer
+            transferNet.fit_generator(folds[j], steps_per_epoch=steps, epochs=epochs, verbose = 0)
             endTime = time.time()
-            #add the time to the transTrainTimes
-            transTrainTimes[i] +=(endTime - startTime)
-        elif (j == 2 & j != i):
-            #start timer
-             startTime = time.time()
-             cnn.fit_generator(fold2, steps_per_epoch=steps, epochs=epochs, verbose = 1)
-             #end timer
-             end_time = time.time()
-             #add the time to the cnnTrainTimes
-             cnnTrainTimes[i] += (endTime - startTime)
-             #start timeer
-             startTime = time.time()
-             transferNet.fit_generator(fold2, steps_per_epoch=steps, epochs=epochs, verbose = 1)
-             #end timer
-             endTime = time.time()
-             #add the time to the transTrainTimes
-             transTrainTimes[i] +=(endTime - startTime)
-        elif (j == 3 & j != i):
-             #start timer
-             startTime = time.time()
-             cnn.fit_generator(fold3, steps_per_epoch=steps, epochs=epochs, verbose = 1)
-             #end timer
-             end_time = time.time()
-             #add the time to the cnnTrainTimes
-             cnnTrainTimes[i] += (endTime - startTime) #start timeer
-             startTime = time.time()
-             transferNet.fit_generator(fold3, steps_per_epoch=steps, epochs=epochs, verbose = 1)
-             #end timer
-             endTime = time.time()
-             #add the time to the transTrainTimes
-             transTrainTimes[i] +=(endTime - startTime)
-        elif (j == 4 & j != i):
-             #start timer
-             startTime = time.time()
-             cnn.fit_generator(fold4, steps_per_epoch=steps, epochs=epochs, verbose = 1)
-             #end timer
-             end_time = time.time()
-             #add the time to the cnnTrainTimes
-             cnnTrainTimes[i] += (endTime - startTime)
-             #start timeer
-             startTime = time.time()
-             transferNet.fit_generator(fold4, steps_per_epoch=steps, epochs=epochs, verbose = 1)
-             #end timer
-             endTime = time.time()
-             #add the time to the transTrainTimes
-             transTrainTimes[i] +=(endTime - startTime)
-        elif (j == 5 & j != i):
-             #start timer
-             startTime = time.time()
-             cnn.fit_generator(fold5, steps_per_epoch=steps, epochs=epochs, verbose = 1)
-             #end timer
-             end_time = time.time()
-             #add the time to the cnnTrainTimes
-             cnnTrainTimes[i] += (endTime - startTime) #start timeer
-             startTime = time.time()
-             transferNet.fit_generator(fold5, steps_per_epoch=steps, epochs=epochs, verbose = 1)
-             #end timer
-             endTime = time.time()
-             #add the time to the transTrainTimes
-             transTrainTimes[i] +=(endTime - startTime)
-    if (i == 1):
-        #start timer
-        startTime = time.time()
-        cnn.evaluate_generator(fold1, verbose = 1)
-        #end timer
-        endTime = time.time()
-        #append the time to cnnTestTime
-        cnnTestTimes[i] += (endTime - startTime)
-        #add to the accuracies
-        #start timer
-        startTime = time.time()
-        transferNet.evaluate_generator(fold1, verbose = 1)
-        #end timer
-        endTime = time.time()
-        #append the time to transTestTime
-        transTestTime += (endTime-startTime)
-        #add to the accuracies
-    elif (i == 2):
-        #start timer
-        startTime = time.time()
-        cnn.evaluate_generator(fold2, verbose = 1)
-        #end timer
-        endTime = time.time()
-        #append the time to cnnTestTime
-        cnnTestTimes[i] += (endTime - startTime)
-        #add to the accuracies
-        #start timer
-        startTime = time.time()
-        transferNet.evaluate_generator(fold2, verbose = 1)
-        #end timer
-        endTime = time.time()
-        #append the time to transTestTime
-        transTestTime += (endTime-startTime)
-        #add to the accuracies
-    elif (i == 3):
-        #start timer
-        startTime = time.time()
-        cnn.evaluate_generator(fold3, verbose = 1)
-        #end timer
-        endTime = time.time()
-        #append the time to cnnTestTime
-        cnnTestTimes[i] += (endTime - startTime)
-        #add to the accuracies
-        #start timer
-        startTime = time.time()
-        transferNet.evaluate_generator(fold3, verbose = 1)
-        #end timer
-        endTime = time.time()
-        #append the time to transTestTime
-        transTestTime += (endTime-startTime)
-        #add to the accuracies
-    elif (i == 4):
-        #start timer
-        startTime = time.time()
-        cnn.evaluate_generator(fold4, verbose = 1)
-        #end timer
-        endTime = time.time()
-        #append the time to cnnTestTime
-        cnnTestTimes[i] += (endTime - startTime)
-        #add to the accuracies
-        #start timer
-        startTime = time.time()
-        transferNet.evaluate_generator(fold4, verbose = 1)
-        #end timer
-        endTime = time.time()
-        #append the time to transTestTime
-        transTestTime += (endTime-startTime)
-        #add to the accuracies
-    elif (i == 5):
-        #start timer
-        startTime = time.time()
-        cnn.evaluate_generator(fold5, verbose = 1)
-        #end timer
-        endTime = time.time()
-        #append the time to cnnTestTime
-        cnnTestTimes[i] += (endTime - startTime)
-        #add to the accuracies
-        #start timer
-        startTime = time.time()
-        transferNet.evaluate_generator(fold5, verbose = 1)
-        #end timer
-        endTime = time.time()
-        #append the time to transTestTime
-        transTestTime += (endTime-startTime)
-        #add to the accuracies
+            transTrainTimes[i] += (endTime - startTime)
+    startTime = time.time()
+    loss, acc = cnn.evaluate_generator(folds[i], verbose = 0)
+    endTime = time.time()
+    cnnTestTimes[i] += (endTime - startTime)
+    cnnAccuracies.append(acc)
+    startTime = time.time()
+    loss, acc = transferNet.evaluate_generator(folds[i], verbose = 0)
+    endTime = time.time()
+    transTestTimes[i] += (endTime - startTime)
+    transAccuracies.append(acc)
+    
+cnnMeanTrain = sum(cnnTrainTimes)/5
+transMeanTrain = sum(transTrainTimes)/5
+cnnMeanTest = sum(cnnTestTimes)/5
+trainsMeanTest = sum(transTestTimes)/5
+cnnMeanAcc = sum(cnnAccuracies)/5
+transMeanAcc = sum(transAccuracies)/5
+
+print("DICE")
+print("----CNN----")
+print("Mean Accuracy: " + cnnMeanAcc)
+print("Mean Train Time: " + cnnMeanTrain)
+print("Mean Test Time: " + cnnMeanTest)
+print("----Each fold----")
+print("Accuracies: " + cnnAccuracies)
+print("Training Times: " + cnnTrainTimes)
+print("Testing Times: " + cnnTestTimes)
+print("/n")
+print("----Transfer Net----")
+print("Mean Accuracy: " + transMeanAcc)
+print("Mean Train Time: " + transMeanTrain)
+print("Mean Test Time: " + transMeanTest)
+print("----Each Fold----")
+print("Accuracies: " + transAccuracies)
+print("Training Times: " + transTrainTimes)
+print("Testing Times: " + transTestTimes)
+print("/n")
