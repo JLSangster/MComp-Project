@@ -2,11 +2,8 @@
 ##CNN solution for dice object classification problem
 
 #imports
-import os
 from keras.preprocessing.image import ImageDataGenerator
-from keras.models import Sequential, Model, load_model
-from keras.layers import Dense, Conv2D, Flatten, MaxPooling2D
-from keras.applications.inception_v3 import InceptionV3
+from keras.models import load_model
 import time
 
 height = 128
@@ -25,10 +22,7 @@ folds = [fold1, fold2, fold3, fold4, fold5]
 
 epochs = 3
 batchSize = 64
-steps = 3278/batchSize
-
-cnn = load_model("cnn.h5")
-transferNet = load_model("transferNet.h5")
+steps = 2100/batchSize
 
 cnnTrainTimes = [0,0,0,0,0]
 cnnTestTimes = [0,0,0,0,0]
@@ -37,54 +31,67 @@ transTrainTimes = [0,0,0,0,0]
 transTestTimes = [0,0,0,0,0]
 transAccuracies = []
 
-loss, acc = cnn.evaluate_generator(fold1)
-print(acc)
-
-for i in range(1,6):
-    for j in range(1,6):
+for i in range(0,5):
+    print(i+1)
+    transferNet = load_model("transferNet.h5")
+    for j in range(0,5):
         if j != i:
+            print("Training")
             startTime=time.time()
-            cnn.fit_generator(folds[j], steps_per_epoch=steps, epochs=epochs, verbose = 0)
-            endTime=time.time()
-            cnnTrainTimes[i] += (endTime - startTime)
-            startTime = time.time()
             transferNet.fit_generator(folds[j], steps_per_epoch=steps, epochs=epochs, verbose = 0)
-            endTime = time.time()
+            endTime=time.time()
             transTrainTimes[i] += (endTime - startTime)
-    startTime = time.time()
-    loss, acc = cnn.evaluate_generator(folds[i], verbose = 0)
-    endTime = time.time()
-    cnnTestTimes[i] += (endTime - startTime)
-    cnnAccuracies.append(acc)
+    print("Testing")
     startTime = time.time()
     loss, acc = transferNet.evaluate_generator(folds[i], verbose = 0)
     endTime = time.time()
     transTestTimes[i] += (endTime - startTime)
     transAccuracies.append(acc)
     
-cnnMeanTrain = sum(cnnTrainTimes)/5
 transMeanTrain = sum(transTrainTimes)/5
-cnnMeanTest = sum(cnnTestTimes)/5
-trainsMeanTest = sum(transTestTimes)/5
-cnnMeanAcc = sum(cnnAccuracies)/5
+transMeanTest = sum(transTestTimes)/5
 transMeanAcc = sum(transAccuracies)/5
 
-print("DICE")
-print("----CNN----")
-print("Mean Accuracy: " + cnnMeanAcc)
-print("Mean Train Time: " + cnnMeanTrain)
-print("Mean Test Time: " + cnnMeanTest)
-print("----Each fold----")
-print("Accuracies: " + cnnAccuracies)
-print("Training Times: " + cnnTrainTimes)
-print("Testing Times: " + cnnTestTimes)
-print("/n")
 print("----Transfer Net----")
-print("Mean Accuracy: " + transMeanAcc)
-print("Mean Train Time: " + transMeanTrain)
-print("Mean Test Time: " + transMeanTest)
+print("Mean Accuracy: " + str(transMeanAcc))
+print("Mean Train Time: " + str(transMeanTrain))
+print("Mean Test Time: " + str(transMeanTest))
 print("----Each Fold----")
-print("Accuracies: " + transAccuracies)
-print("Training Times: " + transTrainTimes)
-print("Testing Times: " + transTestTimes)
+print("Accuracies: " + str(transAccuracies))
+print("Training Times: " + str(transTrainTimes))
+print("Testing Times: " + str(transTestTimes))
 print("/n")
+
+
+print("Training in progress")
+for i in range(0,5):
+    print(i+1)
+    cnn = load_model("cnn.h5")
+    for j in range(0,5):
+        if j != i:
+            print("Training")
+            startTime=time.time()
+            cnn.fit_generator(folds[j], steps_per_epoch=steps, epochs=epochs, verbose = 0)
+            endTime=time.time()
+            cnnTrainTimes[i] += (endTime - startTime)
+    print("Testing")
+    startTime = time.time()
+    loss, acc = cnn.evaluate_generator(folds[i], verbose = 0)
+    endTime = time.time()
+    cnnTestTimes[i] += (endTime - startTime)
+    cnnAccuracies.append(acc)
+
+cnnMeanTrain = sum(cnnTrainTimes)/5
+cnnMeanTest = sum(cnnTestTimes)/5
+cnnMeanAcc = sum(cnnAccuracies)/5
+
+print("----CNN----")
+print("Mean Accuracy: " + str(cnnMeanAcc))
+print("Mean Train Time: " + str(cnnMeanTrain))
+print("Mean Test Time: " + str(cnnMeanTest))
+print("----Each fold----")
+print("Accuracies: " + str(cnnAccuracies))
+print("Training Times: " + str(cnnTrainTimes))
+print("Testing Times: " + str(cnnTestTimes))
+print("/n")
+
