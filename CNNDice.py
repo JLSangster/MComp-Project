@@ -31,6 +31,40 @@ transTrainTimes = [0,0,0,0,0]
 transTestTimes = [0,0,0,0,0]
 transAccuracies = []
 
+fold = 1
+
+print("Training in progress")
+for i in range(0,fold):
+    print(i+1)
+    cnn = load_model("cnn.h5")
+    for j in range(0,5):
+        if j != i:
+            print("Training")
+            startTime=time.time()
+            cnn.fit_generator(folds[j], steps_per_epoch=steps, epochs=epochs)#, verbose = 0)
+            endTime=time.time()
+            cnnTrainTimes[i] += (endTime - startTime)
+    print("Testing")
+    startTime = time.time()
+    loss, acc = cnn.evaluate_generator(folds[i])#, verbose = 0)
+    endTime = time.time()
+    cnnTestTimes[i] += (endTime - startTime)
+    cnnAccuracies.append(acc)
+
+cnnMeanTrain = sum(cnnTrainTimes)/fold
+cnnMeanTest = sum(cnnTestTimes)/fold
+cnnMeanAcc = sum(cnnAccuracies)/fold
+
+print("----CNN----")
+print("Mean Accuracy: " + str(cnnMeanAcc))
+print("Mean Train Time: " + str(cnnMeanTrain))
+print("Mean Test Time: " + str(cnnMeanTest))
+print("----Each fold----")
+print("Accuracies: " + str(cnnAccuracies))
+print("Training Times: " + str(cnnTrainTimes))
+print("Testing Times: " + str(cnnTestTimes))
+print("/n")
+
 for i in range(0,5):
     print(i+1)
     transferNet = load_model("transferNet.h5")
@@ -62,36 +96,4 @@ print("Training Times: " + str(transTrainTimes))
 print("Testing Times: " + str(transTestTimes))
 print("/n")
 
-
-print("Training in progress")
-for i in range(0,5):
-    print(i+1)
-    cnn = load_model("cnn.h5")
-    for j in range(0,5):
-        if j != i:
-            print("Training")
-            startTime=time.time()
-            cnn.fit_generator(folds[j], steps_per_epoch=steps, epochs=epochs, verbose = 0)
-            endTime=time.time()
-            cnnTrainTimes[i] += (endTime - startTime)
-    print("Testing")
-    startTime = time.time()
-    loss, acc = cnn.evaluate_generator(folds[i], verbose = 0)
-    endTime = time.time()
-    cnnTestTimes[i] += (endTime - startTime)
-    cnnAccuracies.append(acc)
-
-cnnMeanTrain = sum(cnnTrainTimes)/5
-cnnMeanTest = sum(cnnTestTimes)/5
-cnnMeanAcc = sum(cnnAccuracies)/5
-
-print("----CNN----")
-print("Mean Accuracy: " + str(cnnMeanAcc))
-print("Mean Train Time: " + str(cnnMeanTrain))
-print("Mean Test Time: " + str(cnnMeanTest))
-print("----Each fold----")
-print("Accuracies: " + str(cnnAccuracies))
-print("Training Times: " + str(cnnTrainTimes))
-print("Testing Times: " + str(cnnTestTimes))
-print("/n")
 
