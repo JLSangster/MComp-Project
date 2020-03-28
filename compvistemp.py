@@ -55,7 +55,7 @@ width = 480
 crossVal = StratifiedKFold(n_splits=5, shuffle=True)
 
 images, labels = load_images(perClass)
-tree = DecisionTreeClassifier(max_depth = 6, min_samples_leaf = 100)
+tree = DecisionTreeClassifier(max_depth = 4, min_samples_leaf = 100)
 print("Extracting features")
 features = np.zeros((sampleNum, featureNum, height, width), np.int8)
 for i in range(0, sampleNum):
@@ -83,6 +83,14 @@ for train, test in crossVal.split(features, labels):
     endTime = time.time()
     testTimes.append((endTime-startTime))
     acc.append(accuracy)
+    print("----Computer vision Tree ---")
+    print("Mean Train Time: " + str(trainMeanTime))
+    print("Mean Test Time: " + str(testMeanTime))
+    print("Mean Accuracy: " + str(meanAcc))
+    print("----Each Fold----")
+    print("Train Times: " + str(trainTimes))
+    print("Test Times: " + str(testTimes))
+    print("Accuracies: " + str(acc))
     
 trainMeanTime = sum(trainTimes) / len(trainTimes)
 testMeanTime = sum(testTimes) / len(testTimes)
