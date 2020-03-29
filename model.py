@@ -2,11 +2,14 @@ from keras.preprocessing.image import ImageDataGenerator
 from keras.models import Sequential, Model
 from keras.layers import Dense, Conv2D, Flatten, MaxPooling2D, AveragePooling2D
 from keras.applications.inception_v3 import InceptionV3
+from keras.optimizers import Adam
 
 height = 128
 width = 128
 channels = 3
 classes = 6
+learningRate = 0.0005
+opt = Adam(learning_rate = learningRate)
 
 print("building")
 cnn = Sequential()
@@ -23,7 +26,7 @@ cnn.add(Dense(10, activation = 'relu'))
 cnn.add(Dense(10, activation = 'relu'))
 cnn.add(Flatten())
 cnn.add(Dense(classes, activation = 'softmax'))
-cnn.compile(optimizer='Adam', loss='categorical_crossentropy', metrics=['accuracy'])
+cnn.compile(optimizer=opt, loss='categorical_crossentropy', metrics=['accuracy'])
 cnn.save("cnn.h5")
 
 inception = InceptionV3(weights ='imagenet', include_top=False, input_shape = (height,width,channels))
@@ -49,7 +52,7 @@ cnnM.add(Dense(10, activation = 'relu'))
 cnnM.add(Dense(10, activation = 'relu'))
 cnnM.add(Flatten())
 cnnM.add(Dense(classes, activation = 'softmax'))
-cnnM.compile(optimizer='SGD', loss='categorical_crossentropy', metrics=['accuracy'])
+cnnM.compile(optimizer='SGD', loss='categorical_crossentropy', metrics=['accuracy'], )
 cnnM.save("cnnMNIST.h5")
 
 inceptionM = InceptionV3(weights ='imagenet', include_top=False, input_shape = (75, 75, 3))
