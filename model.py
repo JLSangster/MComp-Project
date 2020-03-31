@@ -8,7 +8,7 @@ height = 128
 width = 128
 channels = 3
 classes = 6
-learningRate = 0.001
+learningRate = 0.00075
 opt = Adam(learning_rate = learningRate)
 
 print("building")
@@ -34,7 +34,7 @@ tNet = inception.output
 tNet = Flatten()(tNet)
 predictions = Dense(classes, activation = 'softmax')(tNet)
 transferNet = Model(inputs=inception.input, outputs=predictions)
-transferNet.compile(optimizer='Adam', loss='categorical_crossentropy', metrics=['accuracy'])
+transferNet.compile(optimizer='SGD', loss='categorical_crossentropy', metrics=['accuracy'])
 transferNet.save("transferNet.h5")
 print("One Done")
 
