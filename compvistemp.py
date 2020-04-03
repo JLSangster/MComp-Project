@@ -56,7 +56,7 @@ width = 480
 crossVal = StratifiedKFold(n_splits=5, shuffle=True)
 
 images, labels = load_images(perClass)
-tree = DecisionTreeClassifier(max_depth = 6, min_samples_leaf = 50)
+tree = DecisionTreeClassifier(max_depth = 6, min_samples_leaf = 25)
 print("Extracting features")
 features = np.zeros((sampleNum, featureNum, height, width), np.int8)
 for i in range(0, sampleNum):
