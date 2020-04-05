@@ -31,7 +31,7 @@ transTrainTimes = [0,0,0,0,0]
 transTestTimes = [0,0,0,0,0]
 transAccuracies = []
 
-fold = 1
+fold = 5
 
 print("Training in progress")
 for i in range(0,fold):

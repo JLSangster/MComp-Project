@@ -8,7 +8,7 @@ height = 128
 width = 128
 channels = 3
 classes = 6
-learningRate = 0.00075
+learningRate = 0.001
 opt = Adam(learning_rate = learningRate)
 
 print("building")
