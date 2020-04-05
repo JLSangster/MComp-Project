@@ -12,7 +12,6 @@ def load_images(perClass):
     print("Loading data")
     dirs = ['dice/fold1', 'dice/fold2', 'dice/fold3', 'dice/fold4', 'dice/fold5']
     imgDirs = []
-    #pick 10 of each randomly from each fold.
     for each in dirs:
         for folder in os.scandir(each):
             filepath = folder
@@ -23,7 +22,6 @@ def load_images(perClass):
     np.random.shuffle(imgDirs)
     imgDirs = np.array(imgDirs)
     labels = imgDirs[:,-1]
-    #need to format the labels here
     images = []                                                     
     for each in imgDirs[:,0]:
         img = cv2.imread(each)
@@ -36,7 +34,6 @@ def get_features(img):
     if img.shape != (480, 480):
         img= cv2.resize(img, (480, 480))
     grayimg = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    #ret, thresh = cv2.threshold(grayimg,0,255,cv2.THRESH_BINARY+cv2.THRESH_OTSU)
     corners = cv2.cornerHarris(grayimg, 5, 3, 0.01)
     edges = cv2.Canny(img,140,150)
     gKernel = cv2.getGaborKernel((21,21), 9.0, 180, 10.0, 0.5, 0, ktype=cv2.CV_32F)
@@ -55,7 +52,7 @@ width = 480
 crossVal = StratifiedKFold(n_splits=5, shuffle=True)
 
 images, labels = load_images(perClass)
-tree = DecisionTreeClassifier(max_depth = 4, min_samples_leaf = 100)
+tree = DecisionTreeClassifier(max_depth = 6, min_samples_leaf = 125)
 print("Extracting features")
 features = np.zeros((sampleNum, featureNum, height, width), np.int8)
 for i in range(0, sampleNum):
